@@ -1,0 +1,2 @@
+cd bge
+cargo test 
