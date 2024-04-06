@@ -16,6 +16,5 @@ pub fn new_window(screen: Screen) -> Sdl2Env{
 
     Sdl2Env {
         canvas: canvas,
-
     }
 }

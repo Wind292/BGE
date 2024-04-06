@@ -28,6 +28,7 @@ pub struct EngineSettings2D {
     engine_env: RenderingEnvironment
 }
 
+#[derive(Clone)]
 pub enum RenderingEngine2D {
     Sdl2,
 }
@@ -44,10 +45,12 @@ impl Instance2D {
 
 impl EngineSettings2D {
     pub fn new() -> Self {
+        let engine = RenderingEngine2D::Sdl2;
+
         EngineSettings2D {
             // Default values
-            rendering_engine: RenderingEngine2D::Sdl2,
-            engine_env: RenderingEnvironment::Sdl2(sdl2_renderer::new_window(Screen::new())),
+            rendering_engine: engine.clone(),
+            engine_env: render::new_2D_window(engine, Screen::new()),
             use_delta_time: true
         }
         

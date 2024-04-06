@@ -2,8 +2,6 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 
 use crate::sdl2_renderer;
-
-
 use crate::{RenderingEngine2D, Screen};
 
 pub enum RenderingEnvironment {
