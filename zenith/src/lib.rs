@@ -1,6 +1,6 @@
 use std::vec;
 
-use render::{pressed_close, RenderingEnvironment, Vec2};
+use render::{pressed_close, Keys, RenderingEnvironment, Vec2};
 
 mod eventloop;
 mod render;
@@ -32,6 +32,7 @@ pub struct EngineSettings2D {
     use_delta_time: bool,
     engine_env: RenderingEnvironment,
     is_running: bool,
+    keys: Keys
 }
 #[derive(Clone)]
 pub struct Environment {
@@ -94,6 +95,13 @@ impl Instance2D {
         eventloop::eventloop(self)
     }
 
+    pub fn quit(&mut self) { 
+        self.engine_settings.is_running = false
+    }
+
+    pub fn get_pressed(self) -> Keys {
+        self.engine_settings.keys
+    }
 }
 
 impl EngineSettings2D {
@@ -105,7 +113,8 @@ impl EngineSettings2D {
             rendering_engine: engine.clone(),
             engine_env: render::new_2D_window(engine, Screen::new()),
             use_delta_time: true,
-            is_running: true
+            is_running: true,
+            keys: Keys::new()
         }
         
     }
@@ -173,7 +182,7 @@ fn get_builtin_entities() -> Vec<Entity> {
 
 fn close_window(instance: &mut Instance2D) {
     if pressed_close(&instance.engine_settings.rendering_engine, &instance.engine_settings.engine_env) {
-        instance.engine_settings.is_running = false
+        instance.quit()
     }
 }
 
