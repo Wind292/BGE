@@ -1,14 +1,10 @@
 use std::vec;
 
 use render::{pressed_close, RenderingEnvironment, Vec2};
-use sdl2::{event::Event, libc::close};
 
 mod eventloop;
 mod render;
 mod sdl2_renderer;
-
-
-
 
 // !!EXAMPLE!!
 pub fn add(left: usize, right: usize) -> usize {
