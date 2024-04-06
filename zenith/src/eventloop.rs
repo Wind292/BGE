@@ -1,11 +1,10 @@
+use crate::Entity;
 use crate::Instance2D;
-use crate::RunEvent;
-use crate::RunEventList;
 use std::time::{Duration, Instant};
 
-pub fn eventloop(instance: &mut Instance2D) {
+pub fn eventloop(instance: Instance2D) {
 
-    start_entities(instance); // Run the start functions on all of the entities
+    let mut instance = start_entities(instance);  // Run the start functions on all of the entities
 
     let framerate_goal = instance.screen.framerate_cap;
     let frame_duration = Duration::from_secs(1) / framerate_goal as u32;
@@ -17,42 +16,32 @@ pub fn eventloop(instance: &mut Instance2D) {
         if !instance.engine_settings.is_running {break}
         let frame_start_time = Instant::now();
 
-        let mut run_event_list = RunEventList::empty();
-
-        update_entities(instance, &mut run_event_list);
+        instance = update_entities(instance);
 
         maintain_framerate(frame_duration, &mut last_frame_time, frame_start_time);
     }
 }
 
-fn update_entities(instance: &mut Instance2D, run_event_list: &mut RunEventList) {
-    for entity in &instance.environment.entities {
-        if let Some(update_function) = entity.update_function {
-            run_event_list.merge(&mut update_function(instance));
+fn update_entities(mut instance: Instance2D) -> Instance2D {
+    let entities = instance.environment.entities.clone();
+    for entity in entities {
+        if let Some(update_function) = &entity.update_function {
+            update_function(&mut instance);
         }
     }
-
-    for event in &run_event_list.events {
-        execute_run_event(*event, instance)
-    }
-
+    instance
 }
 
-fn execute_run_event(run_event: RunEvent, instance: &mut Instance2D) {
-    match run_event {
-        RunEvent::Quit => {
-            instance.engine_settings.is_running = false;
+fn start_entities(mut instance: Instance2D) -> Instance2D {
+    let entities = instance.environment.entities.clone();
+    for entity in entities {
+        if let Some(start_function) = &entity.start_function {
+            start_function(&mut instance);
         }
     }
+    instance
 }
 
-fn start_entities(instance: &Instance2D) {
-    for entity in &instance.environment.entities {
-        if let Some(start_function) = entity.start_function {
-            start_function(instance);
-        }
-    }
-}
 
 
 fn maintain_framerate(

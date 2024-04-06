@@ -5,7 +5,3 @@ fn main() {
 
     instance.start()
 }
-
-fn update_rect() {
-    
-}

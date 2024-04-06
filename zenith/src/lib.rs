@@ -37,41 +37,41 @@ pub struct EngineSettings2D {
 pub struct Environment {
     entities: Vec<Entity>
 }
-#[derive(Clone, Copy)]
-pub enum RunEvent {
-    Quit,
-}
+// #[derive(Clone, Copy)]
+// pub enum RunEvent {
+//     Quit,
+// }
 
-pub struct  RunEventList {
-    events: Vec<RunEvent>
-}
+// pub struct  RunEventList {
+//     events: Vec<RunEvent>
+// }
 
-impl RunEventList {
-    pub fn add_event(&mut self, event: RunEvent) {
-        self.events.push(event);
-    }
-    pub fn single(event: RunEvent) -> Self {
-        RunEventList {
-            events: vec![event]
-        }
-    }
-    pub fn empty() -> Self {
-        RunEventList {
-            events: vec![]
-        }
-    }
-    pub fn merge(&mut self, other_list: &mut RunEventList) {
-        self.events.append(&mut other_list.events)
-    }
-}
+// impl RunEventList {
+//     pub fn add_event(&mut self, event: RunEvent) {
+//         self.events.push(event);
+//     }
+//     pub fn single(event: RunEvent) -> Self {
+//         RunEventList {
+//             events: vec![event]
+//         }
+//     }
+//     pub fn empty() -> Self {
+//         RunEventList {
+//             events: vec![]
+//         }
+//     }
+//     pub fn merge(&mut self, other_list: &mut RunEventList) {
+//         self.events.append(&mut other_list.events)
+//     }
+// }
 
 #[derive(Clone)]
 pub struct Entity {
     location: Option<Vec2>,
     velocity: Option<Vec2>,
     size: Option<Vec2>,
-    update_function: Option<fn(&Instance2D)-> RunEventList>,
-    start_function: Option<fn(&Instance2D)-> RunEventList>
+    update_function: Option<fn(&mut Instance2D)>,
+    start_function: Option<fn(&mut Instance2D)>
 }
 
 #[derive(Clone)]
@@ -90,7 +90,7 @@ impl Instance2D {
         }
     }
     
-    pub fn start(&mut self) {
+    pub fn start(self) {
         eventloop::eventloop(self)
     }
 
@@ -171,11 +171,10 @@ fn get_builtin_entities() -> Vec<Entity> {
     entities
 }
 
-fn close_window(instance: &Instance2D) -> RunEventList {
+fn close_window(instance: &mut Instance2D) {
     if pressed_close(&instance.engine_settings.rendering_engine, &instance.engine_settings.engine_env) {
-        return RunEventList::single(RunEvent::Quit);
+        instance.engine_settings.is_running = false
     }
-    RunEventList::empty()
 }
 
 #[cfg(test)]
