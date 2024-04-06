@@ -4,6 +4,34 @@ use sdl2::video::Window;
 use crate::sdl2_renderer;
 use crate::{RenderingEngine2D, Screen};
 
+pub struct Vec2 {
+    pub x: i32,
+    pub y: i32,
+}
+
+impl Vec2 {
+    pub fn new(x: i32, y:i32) -> Self {
+        Vec2 {
+            x: x,
+            y: y
+        }
+    }
+}
+
+pub struct VisualRect {
+    pub location: Vec2,
+    pub size: Vec2
+}
+
+impl VisualRect {
+    pub fn new(location: Vec2, size: Vec2) -> Self {
+        VisualRect {
+            location: location,
+            size: size
+        }
+    }
+}
+
 pub enum RenderingEnvironment {
     Sdl2(Sdl2Env),
 }
@@ -20,3 +48,6 @@ pub fn new_2D_window(engine: RenderingEngine2D, screen: Screen) -> RenderingEnvi
         }
     }
 }
+
+
+

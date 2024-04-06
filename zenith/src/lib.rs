@@ -41,6 +41,10 @@ impl Instance2D {
             engine_settings: EngineSettings2D::new(),
         }
     }
+    
+    pub fn start() {
+        
+    }
 }
 
 impl EngineSettings2D {
