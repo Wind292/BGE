@@ -1,23 +1,24 @@
-use crate::Entity;
+use crate::render::update_keystrokes;
 use crate::Instance2D;
 use std::time::{Duration, Instant};
 
 pub fn eventloop(instance: Instance2D) {
-
-    let mut instance = start_entities(instance);  // Run the start functions on all of the entities
+    let mut instance = start_entities(instance); // Run the start functions on all of the entities
 
     let framerate_goal = instance.screen.framerate_cap;
     let frame_duration = Duration::from_secs(1) / framerate_goal as u32;
     let mut last_frame_time = Instant::now();
 
-   
-
     loop {
-        if !instance.engine_settings.is_running {break}
         let frame_start_time = Instant::now();
+        if !instance.engine_settings.is_running {
+            break;
+        }
+
+        update_keystrokes(&mut instance);
 
         instance = update_entities(instance);
-
+        
         maintain_framerate(frame_duration, &mut last_frame_time, frame_start_time);
     }
 }
@@ -41,8 +42,6 @@ fn start_entities(mut instance: Instance2D) -> Instance2D {
     }
     instance
 }
-
-
 
 fn maintain_framerate(
     frame_duration: Duration,

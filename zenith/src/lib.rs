@@ -12,8 +12,6 @@ pub fn add(left: usize, right: usize) -> usize {
 }
 // !!  !!!  !!
 
-
-
 pub struct Instance2D {
     pub screen: Screen,
     pub engine_settings: EngineSettings2D,
@@ -24,19 +22,19 @@ pub struct Instance2D {
 pub struct Screen {
     caption: String,
     framerate_cap: u32,
-    window_size: (u32,u32),
+    window_size: (u32, u32),
 }
 
 pub struct EngineSettings2D {
     rendering_engine: RenderingEngine2D,
-    use_delta_time: bool,
+    pub use_delta_time: bool,
     engine_env: RenderingEnvironment,
-    is_running: bool,
-    keys: Keys
+    pub is_running: bool,
+    pub keys: Keys,
 }
 #[derive(Clone)]
 pub struct Environment {
-    entities: Vec<Entity>
+    entities: Vec<Entity>,
 }
 // #[derive(Clone, Copy)]
 // pub enum RunEvent {
@@ -68,18 +66,54 @@ pub struct Environment {
 
 #[derive(Clone)]
 pub struct Entity {
-    location: Option<Vec2>,
-    velocity: Option<Vec2>,
-    size: Option<Vec2>,
-    update_function: Option<fn(&mut Instance2D)>,
-    start_function: Option<fn(&mut Instance2D)>
+    pub location: Option<Vec2>,
+    pub velocity: Option<Vec2>,
+    pub size: Option<Vec2>,
+    pub update_function: Option<fn(&mut Instance2D)>,
+    pub start_function: Option<fn(&mut Instance2D)>,
 }
 
+impl Entity {
+    pub fn new() -> Self {
+        Entity {
+            location: None,
+            velocity: None,
+            size: None,
+            update_function: None,
+            start_function: None,
+        }
+    }
+
+    pub fn with_location(self, location: Vec2) -> Self {
+        let mut x = self;
+        x.location = Some(location);
+        x
+    }
+    pub fn with_velocity(self, velocity: Vec2) -> Self {
+        let mut x = self;
+        x.velocity = Some(velocity);
+        x
+    }
+    pub fn with_size(self, size: Vec2) -> Self {
+        let mut x = self;
+        x.size = Some(size);
+        x
+    }
+    pub fn with_update_fn(self, update_fn: fn(&mut Instance2D)) -> Self {
+        let mut x = self;
+        x.update_function = Some(update_fn);
+        x
+    }
+    pub fn with_start_fn(self, start_fn: fn(&mut Instance2D)) -> Self {
+        let mut x = self;
+        x.start_function = Some(start_fn);
+        x
+    }
+}
 #[derive(Clone)]
 pub enum RenderingEngine2D {
     Sdl2,
 }
-
 
 impl Instance2D {
     pub fn new() -> Self {
@@ -87,21 +121,24 @@ impl Instance2D {
             // Default values
             screen: Screen::new(),
             engine_settings: EngineSettings2D::new(),
-            environment: Environment::new()
+            environment: Environment::new(),
         }
     }
-    
+
     pub fn start(self) {
         eventloop::eventloop(self)
     }
 
-    pub fn quit(&mut self) { 
+    pub fn quit(&mut self) {
         self.engine_settings.is_running = false
     }
 
-    pub fn get_pressed(self) -> Keys {
-        self.engine_settings.keys
+    pub fn get_pressed(&self) -> &Keys {
+        &self.engine_settings.keys
     }
+
+
+
 }
 
 impl EngineSettings2D {
@@ -114,14 +151,12 @@ impl EngineSettings2D {
             engine_env: render::new_2D_window(engine, Screen::new()),
             use_delta_time: true,
             is_running: true,
-            keys: Keys::new()
+            keys: Keys::new(),
         }
-        
     }
 }
 
-
-// Adding functionality to the Screen struct 
+// Adding functionality to the Screen struct
 
 impl Screen {
     pub fn new() -> Self {
@@ -129,7 +164,7 @@ impl Screen {
             // Default values
             caption: String::from("Zenith Game Window"),
             framerate_cap: 60,
-            window_size: (600, 400)
+            window_size: (600, 400),
         }
     }
 
@@ -141,10 +176,9 @@ impl Screen {
         self.framerate_cap = cap;
     }
 
-    pub fn set_window_size(&mut self, size: (u32,u32)) {
+    pub fn set_window_size(&mut self, size: (u32, u32)) {
         self.window_size = size;
     }
-
 
     pub fn get_caption(&self) -> &String {
         &self.caption
@@ -157,13 +191,12 @@ impl Screen {
     pub fn get_window_size(&self) -> &(u32, u32) {
         &self.window_size
     }
-
 }
 
 impl Environment {
     pub fn new() -> Self {
         Environment {
-            entities: get_builtin_entities()
+            entities: get_builtin_entities(),
         }
     }
 
@@ -175,13 +208,13 @@ impl Environment {
 fn get_builtin_entities() -> Vec<Entity> {
     let mut entities = vec![];
 
-    entities.push(Entity {location: None, velocity: None, size: None, update_function: Some(close_window), start_function: None});
+    entities.push(Entity::new().with_update_fn(close_window));
 
     entities
 }
 
 fn close_window(instance: &mut Instance2D) {
-    if pressed_close(&instance.engine_settings.rendering_engine, &instance.engine_settings.engine_env) {
+    if instance.get_pressed().QUIT {
         instance.quit()
     }
 }
@@ -192,7 +225,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = add(2, 2) ;
+        let result = add(2, 2);
         assert_eq!(result, 4);
     }
 }
