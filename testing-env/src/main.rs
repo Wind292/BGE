@@ -1,5 +1,6 @@
-use bge::*;
+use zenith::*;
 
 fn main() {
-    println!("{}", add(1,2));
+    let mut instance = Instance2D::new();
 }
+
