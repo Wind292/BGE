@@ -4,5 +4,7 @@ fn main() {
     let mut instance = Instance2D::new();
 
     
+
+    instance.start()
 }
 

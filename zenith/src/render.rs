@@ -1,9 +1,10 @@
-use sdl2::render::Canvas;
+use sdl2::render::{self, Canvas};
 use sdl2::video::Window;
-
-use crate::sdl2_renderer;
+use sdl2::Sdl;
+use crate::sdl2_renderer::{self, sdl2_pressed_close};
 use crate::{RenderingEngine2D, Screen};
 
+#[derive(Clone)]
 pub struct Vec2 {
     pub x: i32,
     pub y: i32,
@@ -32,12 +33,15 @@ impl VisualRect {
     }
 }
 
+
 pub enum RenderingEnvironment {
     Sdl2(Sdl2Env),
 }
 
+
 pub struct Sdl2Env {
     pub canvas: Canvas<Window>,
+    pub sdl_context: Sdl
 }
 
 #[allow(non_snake_case)]
@@ -49,5 +53,25 @@ pub fn new_2D_window(engine: RenderingEngine2D, screen: Screen) -> RenderingEnvi
     }
 }
 
+pub fn draw_rect(rect: VisualRect, engine: RenderingEngine2D, screen: Screen) -> RenderingEnvironment {
+    match engine {
+        RenderingEngine2D::Sdl2 => {
+            return RenderingEnvironment::Sdl2(sdl2_renderer::new_window(screen));
+        }
+    }
+}
 
+#[allow(irrefutable_let_patterns)]
+pub fn pressed_close(engine: &RenderingEngine2D, rendering_environment: &RenderingEnvironment) -> bool {
+    match engine {
+        RenderingEngine2D::Sdl2 => {
+            if let RenderingEnvironment::Sdl2(env) = rendering_environment {
+                sdl2_pressed_close(env)
+            }
+            else {
+                false
+            }
+        }
+    }
+}
 

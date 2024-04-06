@@ -2,8 +2,8 @@ use crate::render::Sdl2Env;
 use crate::render::VisualRect;
 use crate::Screen;
 
+use sdl2::event::Event;
 use sdl2::rect::Rect;
-
 
 pub fn new_window(screen: Screen) -> Sdl2Env{
     let sdl_context = sdl2::init().unwrap();
@@ -19,11 +19,23 @@ pub fn new_window(screen: Screen) -> Sdl2Env{
 
     Sdl2Env {
         canvas: canvas,
+        sdl_context: sdl_context
     }
 }
 
-pub fn draw_rect(sdl2_env: &mut Sdl2Env, rect: VisualRect) {
+pub fn sdl2_pressed_close(sdl2_env: &Sdl2Env) -> bool {
+    if let Some(event) = sdl2_env.sdl_context.event_pump().unwrap().poll_event() {
+        match event {
+            Event::Quit {..} => {
+                return true
+            },
+            _ => {}
+        }
+    }
+    return false
+}
 
+pub fn sdl2_draw_rect(sdl2_env: &mut Sdl2Env, rect: VisualRect) {
     let width_result = rect.size.x.try_into();
     let width: u32 = match width_result {
         Ok(val) => val,
