@@ -1,6 +1,6 @@
 use std::vec;
 
-use render::{pressed_close, Keys, RenderingEnvironment, Vec2};
+use render::{ Keys, RenderingEnvironment, Vec2};
 
 mod eventloop;
 mod render;
@@ -26,7 +26,6 @@ pub struct Screen {
 }
 
 pub struct EngineSettings2D {
-    rendering_engine: RenderingEngine2D,
     pub use_delta_time: bool,
     engine_env: RenderingEnvironment,
     pub is_running: bool,
@@ -110,10 +109,14 @@ impl Entity {
         x
     }
 }
+
 #[derive(Clone)]
 pub enum RenderingEngine2D {
     Sdl2,
 }
+
+
+
 
 impl Instance2D {
     pub fn new() -> Self {
@@ -147,7 +150,6 @@ impl EngineSettings2D {
 
         EngineSettings2D {
             // Default values
-            rendering_engine: engine.clone(),
             engine_env: render::new_2D_window(engine, Screen::new()),
             use_delta_time: true,
             is_running: true,
@@ -208,16 +210,22 @@ impl Environment {
 fn get_builtin_entities() -> Vec<Entity> {
     let mut entities = vec![];
 
-    entities.push(Entity::new().with_update_fn(close_window));
+    entities.push(Entity::new().with_update_fn(close_window_builtin));
+    entities.push(Entity::new().with_update_fn(update_display_builtin));
 
     entities
 }
 
-fn close_window(instance: &mut Instance2D) {
+fn close_window_builtin(instance: &mut Instance2D) {
     if instance.get_pressed().QUIT {
         instance.quit()
     }
 }
+
+fn update_display_builtin(instance: &mut Instance2D) {
+    
+}
+
 
 #[cfg(test)]
 mod tests {

@@ -1,8 +1,8 @@
-use crate::sdl2_renderer::{self, sdl2_pressed_close};
+use crate::sdl2_renderer::{self};
 use crate::{Instance2D, RenderingEngine2D, Screen};
-use sdl2::keyboard::{KeyboardState, Keycode};
-use sdl2::render::{self, Canvas};
-use sdl2::sys::fd_mask;
+use sdl2::keyboard::Keycode;
+use sdl2::render::Canvas;
+
 use sdl2::video::Window;
 use sdl2::Sdl;
 use sdl2::event::Event;
@@ -41,7 +41,7 @@ pub struct Sdl2Env {
     pub canvas: Canvas<Window>,
     pub sdl_context: Sdl,
 }
-
+#[allow(non_snake_case)]
 #[derive(Debug)]
 pub struct Keys {
     pub A: bool,
@@ -174,8 +174,8 @@ impl Keys {
 
 pub fn update_keystrokes(instance: &mut Instance2D) {
     match &instance.engine_settings.engine_env {
-        RenderingEnvironment::Sdl2(Sdl2Env) => {
-            for event in Sdl2Env.sdl_context.event_pump().unwrap().poll_iter() {
+        RenderingEnvironment::Sdl2(sdl2_env) => {
+            for event in sdl2_env.sdl_context.event_pump().unwrap().poll_iter() {
                 match event {
                     Event::Quit {..} => instance.engine_settings.keys.QUIT = true,
                     Event::KeyDown { keycode: Some(key), .. } => {
@@ -275,18 +275,9 @@ pub fn draw_rect(rect: VisualRect, env: &mut RenderingEnvironment) {
     }
 }
 
-#[allow(irrefutable_let_patterns)]
-pub fn pressed_close(
-    engine: &RenderingEngine2D,
-    rendering_environment: &RenderingEnvironment,
-) -> bool {
-    match engine {
-        RenderingEngine2D::Sdl2 => {
-            if let RenderingEnvironment::Sdl2(env) = rendering_environment {
-                sdl2_pressed_close(env)
-            } else {
-                false
-            }
-        }
+pub fn update_display(env: &mut RenderingEnvironment) {
+    match env {
+        RenderingEnvironment::Sdl2(sld2_env) => sdl2_renderer::sdl2_update_display(sld2_env),
     }
 }
+
