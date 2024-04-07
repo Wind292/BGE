@@ -1,6 +1,6 @@
 use std::vec;
 
-use render::{ Color, Keys, RenderingEnvironment, Vec2};
+use render::{Color, Keys, RenderingEnvironment, Vec2};
 
 mod eventloop;
 mod render;
@@ -33,99 +33,60 @@ pub struct EngineSettings2D {
 }
 #[derive(Clone)]
 pub struct Environment {
-    entities: Vec<Entity>,
+    entities: Vec<Entity<i32>>, // Default Entity tag type is set to i32
 }
-// #[derive(Clone, Copy)]
-// pub enum RunEvent {
-//     Quit,
-// }
-
-// pub struct  RunEventList {
-//     events: Vec<RunEvent>
-// }
-
-// impl RunEventList {
-//     pub fn add_event(&mut self, event: RunEvent) {
-//         self.events.push(event);
-//     }
-//     pub fn single(event: RunEvent) -> Self {
-//         RunEventList {
-//             events: vec![event]
-//         }
-//     }
-//     pub fn empty() -> Self {
-//         RunEventList {
-//             events: vec![]
-//         }
-//     }
-//     pub fn merge(&mut self, other_list: &mut RunEventList) {
-//         self.events.append(&mut other_list.events)
-//     }
-// }
-
-struct EntityTag<T> {
+#[derive(Clone)]
+pub struct EntityTag<T> {
     tag_name: String,
     tag_value: TagValue<T>,
 }
-
-enum TagValue<T> {
+#[derive(Clone)]
+pub enum TagValue<T> {
     Value(T),
 }
 
 #[derive(Clone)]
-pub struct Entity {
-    pub location: Option<Vec2>,
-    pub velocity: Option<Vec2>,
-    pub size: Option<Vec2>,
+pub struct Entity<T> {
     pub update_function: Option<fn(&mut Instance2D)>,
     pub start_function: Option<fn(&mut Instance2D)>,
+    pub tags: Vec<EntityTag<T>>,
 }
 
-impl Entity {
+impl<T> Entity<T> {
     pub fn new() -> Self {
         Entity {
-            location: None,
-            velocity: None,
-            size: None,
             update_function: None,
             start_function: None,
+            tags: Vec::new(),
         }
     }
 
-    pub fn with_location(self, location: Vec2) -> Self {
-        let mut x = self;
-        x.location = Some(location);
-        x
-    }
-    pub fn with_velocity(self, velocity: Vec2) -> Self {
-        let mut x = self;
-        x.velocity = Some(velocity);
-        x
-    }
-    pub fn with_size(self, size: Vec2) -> Self {
-        let mut x = self;
-        x.size = Some(size);
-        x
-    }
+
     pub fn with_update_fn(self, update_fn: fn(&mut Instance2D)) -> Self {
         let mut x = self;
         x.update_function = Some(update_fn);
         x
     }
+
     pub fn with_start_fn(self, start_fn: fn(&mut Instance2D)) -> Self {
         let mut x = self;
         x.start_function = Some(start_fn);
         x
     }
+
+    pub fn with_tag(self, tag_name: String, tag_value: T) -> Self {
+        let mut x = self;
+        x.tags.push(EntityTag {
+            tag_name,
+            tag_value: TagValue::Value(tag_value),
+        });
+        x
+    }
 }
 
-#[derive(Clone)]
 pub enum RenderingEngine2D {
     Sdl2,
 }
-
-
-
 
 impl Instance2D {
     pub fn new() -> Self {
@@ -152,8 +113,6 @@ impl Instance2D {
     pub fn update_display(&mut self) {
         
     }
-
-
 }
 
 impl EngineSettings2D {
@@ -218,12 +177,12 @@ impl Environment {
         }
     }
 
-    pub fn add_entity(&mut self, entity: Entity) {
+    pub fn add_entity(&mut self, entity: Entity<i32>) {
         self.entities.push(entity);
     }
 }
 
-fn get_builtin_entities() -> Vec<Entity> {
+fn get_builtin_entities() -> Vec<Entity<i32>> {
     let mut entities = vec![];
 
     entities.push(Entity::new().with_update_fn(close_window_builtin));
@@ -241,7 +200,6 @@ fn close_window_builtin(instance: &mut Instance2D) {
 fn update_display_builtin(instance: &mut Instance2D) {
     instance.engine_settings.update_display();
 }
-
 
 #[cfg(test)]
 mod tests {

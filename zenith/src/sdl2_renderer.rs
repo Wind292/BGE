@@ -1,7 +1,6 @@
 use crate::render::Sdl2Env;
 use crate::render::VisualRect;
 use crate::Screen;
-use crate::render::Color;
 
 use sdl2::rect::Rect;
 
