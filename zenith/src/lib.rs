@@ -1,5 +1,3 @@
-use std::{collections::btree_map::VacantEntry, ptr::eq, vec};
-
 use render::{Color, Keys, RenderingEnvironment, Vec2};
 use std::collections::HashMap;
 
@@ -32,22 +30,33 @@ pub struct EngineSettings2D {
     pub is_running: bool,
     pub keys: Keys,
 }
+
 #[derive(Clone)]
 pub struct Environment {
     entities: Vec<Entity>, // Default Entity tag type is set to i32
+    update_scripts: Vec<(String, fn(&mut Instance2D))>,
+    start_scripts: Vec<(String, fn(&mut Instance2D))>,
 }
 
 impl Environment {
     pub fn new() -> Self {
         Environment {
-            entities: get_builtin_entities(),
+            entities: Vec::new(),
+            update_scripts: get_builtin_update_functions(),
+            start_scripts: Vec::new(),
         }
     }
 
     pub fn new_skeleton() -> Self {
         Environment {
-            entities: Vec::new()
+            entities: Vec::new(),
+            update_scripts: Vec::new(),
+            start_scripts: Vec::new(),
         }
+    }
+
+    pub fn add_update_script(&mut self, name: &str, script: fn(&mut Instance2D)) {
+        self.update_scripts.push((name.to_string(), script))
     }
 
     pub fn add_entity(&mut self, entity: Entity) {
@@ -68,9 +77,21 @@ impl Environment {
             } else {
                 println!("'Unnamed Entity' :")
             }
-            
+
             ent.print_tags();
             print!("\n");
+        }
+    }
+
+    pub fn print_all_scripts(&self) {
+        println!("Start Scripts -");
+        for script in &self.start_scripts {
+            println!("    {}",script.0)
+        }
+        print!("\n");
+        println!("Update Scripts -");
+        for script in &self.update_scripts {
+            println!("    {}",script.0)
         }
     }
 
@@ -86,9 +107,7 @@ impl Environment {
     }
 }
 
-
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum TagValue {
     String(String),
     Int(i32),
@@ -100,8 +119,8 @@ pub enum TagValue {
 
 #[derive(Clone)]
 pub struct Entity {
-    pub update_function: Option<fn(&mut Instance2D)>,
-    pub start_function: Option<fn(&mut Instance2D)>,
+    pub update_function: Option<fn(&mut Entity)>,
+    pub start_function: Option<fn(&mut Entity)>,
     pub tags: HashMap<String, TagValue>,
 }
 
@@ -114,14 +133,13 @@ impl Entity {
         }
     }
 
-
-    pub fn with_update_fn(self, update_fn: fn(&mut Instance2D)) -> Self {
+    pub fn with_update_fn(self, update_fn: fn(&mut Entity)) -> Self {
         let mut x = self;
         x.update_function = Some(update_fn);
         x
     }
 
-    pub fn with_start_fn(self, start_fn: fn(&mut Instance2D)) -> Self {
+    pub fn with_start_fn(self, start_fn: fn(&mut Entity)) -> Self {
         let mut x = self;
         x.start_function = Some(start_fn);
         x
@@ -134,31 +152,29 @@ impl Entity {
     }
     pub fn with_name_tag(self, name: &str) -> Self {
         let mut x = self;
-        x.tags.insert("name".to_string(), TagValue::String(name.to_string()));
+        x.tags
+            .insert("name".to_string(), TagValue::String(name.to_string()));
         x
     }
 
-    pub fn get_tag(&self, tag_name: &str) ->  Option<TagValue> {
+    pub fn get_tag(&self, tag_name: &str) -> Option<TagValue> {
         self.tags.get(tag_name).cloned()
     }
 
-    pub fn get_name(&self) ->  String {
+    pub fn get_name(&self) -> String {
         match self.tags.get("name") {
             Some(TagValue::String(a)) => a.to_string(),
-            _=>"'Unnamed'".to_string()
+            _ => "'Unnamed'".to_string(),
         }
     }
-    
 
     pub fn print_tags(&self) {
         for tag in &self.tags {
             match tag {
-                _=> println!("{} : {:?}", tag.0, tag.1)
+                _ => println!("{} : {:?}", tag.0, tag.1),
             }
-
         }
     }
-
 }
 
 pub enum RenderingEngine2D {
@@ -196,10 +212,7 @@ impl Instance2D {
         &self.engine_settings.keys
     }
 
-    pub fn add_tag_handler( ) { 
-
-    }
-
+    pub fn add_tag_handler() {}
 }
 
 impl EngineSettings2D {
@@ -257,14 +270,19 @@ impl Screen {
     }
 }
 
+fn get_builtin_update_functions() -> Vec<(String, fn(&mut Instance2D))> {
+    let mut scripts: Vec<(String, fn(&mut Instance2D))> = Vec::new();
 
-fn get_builtin_entities() -> Vec<Entity> {
-    let mut entities = vec![];
+    scripts.push((
+        "Close Window Function - BUILT-IN".to_string(),
+        close_window_builtin,
+    )); //"Close Window Function - BUILT-IN"
+    scripts.push((
+        "Update Display Function - BUILT-IN".to_string(),
+        update_display_builtin,
+    )); //Update Display Function - BUILT-IN
 
-    entities.push(Entity::new().with_update_fn(close_window_builtin).with_name_tag("Close Window Function - BUILT-IN"));
-    entities.push(Entity::new().with_update_fn(update_display_builtin).with_name_tag("Update Display Function - BUILT-IN"));
-
-    entities
+    scripts
 }
 
 fn close_window_builtin(instance: &mut Instance2D) {

@@ -1,16 +1,12 @@
 use zenith::*;
 
 fn main() {
-    let mut instance = Instance2D::new_skeleton();
+    let instance = Instance2D::new();
 
-    instance
-        .environment
-        .add_entity(Entity::new().with_name_tag("test"));
+    instance.environment.print_all_entities();
 
-    let mut e = Entity::new().with_name_tag("hello");
-
-    instance.environment.overwrite("test", &mut e);
-
-    instance.environment.print_all_entities()
+    instance.environment.print_all_scripts();
+    
+    instance.start()
 
 }

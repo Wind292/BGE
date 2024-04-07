@@ -3,19 +3,17 @@ use crate::{Instance2D, RenderingEngine2D, Screen};
 use sdl2::keyboard::Keycode;
 use sdl2::render::Canvas;
 
+use sdl2::event::Event;
 use sdl2::video::Window;
 use sdl2::Sdl;
-use sdl2::event::Event;
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Vec2 {
     pub x: i32,
     pub y: i32,
 }
 
-#[derive(Clone)]
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
@@ -27,15 +25,11 @@ impl Color {
         Color {
             r: 255,
             g: 255,
-            b: 255
+            b: 255,
         }
     }
     pub fn black() -> Self {
-        Color {
-            r: 0,
-            g: 0,
-            b: 0
-        }
+        Color { r: 0, g: 0, b: 0 }
     }
 }
 
@@ -48,7 +42,7 @@ impl Vec2 {
 pub struct VisualRect {
     pub location: Vec2,
     pub size: Vec2,
-    pub color: Color
+    pub color: Color,
 }
 
 impl VisualRect {
@@ -56,7 +50,7 @@ impl VisualRect {
         VisualRect {
             location: location,
             size: size,
-            color: color
+            color: color,
         }
     }
 }
@@ -165,48 +159,109 @@ impl Keys {
 impl Keys {
     pub fn all_pressed_str(&self) -> Vec<&str> {
         let mut pressed: Vec<&str> = vec![];
-        if self.ESCAPE == true {pressed.push("escape")}
-        if self.SPACE == true {pressed.push("space")}
-        if self.LSHIFT == true {pressed.push("lshift")}
-        if self.RSHIFT == true {pressed.push("rshift")}
-        if self.A == true {pressed.push("a")}
-        if self.B == true {pressed.push("b")}
-        if self.C == true {pressed.push("c")}
-        if self.D == true {pressed.push("d")}
-        if self.E == true {pressed.push("e")}
-        if self.F == true {pressed.push("f")}
-        if self.G == true {pressed.push("g")}
-        if self.H == true {pressed.push("h")}
-        if self.I == true {pressed.push("i")}
-        if self.J == true {pressed.push("j")}
-        if self.K == true {pressed.push("k")}
-        if self.L == true {pressed.push("l")}
-        if self.M == true {pressed.push("m")}
-        if self.N == true {pressed.push("n")}
-        if self.O == true {pressed.push("o")}
-        if self.P == true {pressed.push("p")}
-        if self.Q == true {pressed.push("q")}
-        if self.R == true {pressed.push("r")}
-        if self.S == true {pressed.push("s")}
-        if self.T == true {pressed.push("t")}
-        if self.U == true {pressed.push("u")}
-        if self.V == true {pressed.push("v")}
-        if self.W == true {pressed.push("w")}
-        if self.X == true {pressed.push("x")}
-        if self.Y == true {pressed.push("y")}
-        if self.Z == true {pressed.push("z")}
+        if self.ESCAPE == true {
+            pressed.push("escape")
+        }
+        if self.SPACE == true {
+            pressed.push("space")
+        }
+        if self.LSHIFT == true {
+            pressed.push("lshift")
+        }
+        if self.RSHIFT == true {
+            pressed.push("rshift")
+        }
+        if self.A == true {
+            pressed.push("a")
+        }
+        if self.B == true {
+            pressed.push("b")
+        }
+        if self.C == true {
+            pressed.push("c")
+        }
+        if self.D == true {
+            pressed.push("d")
+        }
+        if self.E == true {
+            pressed.push("e")
+        }
+        if self.F == true {
+            pressed.push("f")
+        }
+        if self.G == true {
+            pressed.push("g")
+        }
+        if self.H == true {
+            pressed.push("h")
+        }
+        if self.I == true {
+            pressed.push("i")
+        }
+        if self.J == true {
+            pressed.push("j")
+        }
+        if self.K == true {
+            pressed.push("k")
+        }
+        if self.L == true {
+            pressed.push("l")
+        }
+        if self.M == true {
+            pressed.push("m")
+        }
+        if self.N == true {
+            pressed.push("n")
+        }
+        if self.O == true {
+            pressed.push("o")
+        }
+        if self.P == true {
+            pressed.push("p")
+        }
+        if self.Q == true {
+            pressed.push("q")
+        }
+        if self.R == true {
+            pressed.push("r")
+        }
+        if self.S == true {
+            pressed.push("s")
+        }
+        if self.T == true {
+            pressed.push("t")
+        }
+        if self.U == true {
+            pressed.push("u")
+        }
+        if self.V == true {
+            pressed.push("v")
+        }
+        if self.W == true {
+            pressed.push("w")
+        }
+        if self.X == true {
+            pressed.push("x")
+        }
+        if self.Y == true {
+            pressed.push("y")
+        }
+        if self.Z == true {
+            pressed.push("z")
+        }
         pressed
     }
 }
-
 
 pub fn update_keystrokes(instance: &mut Instance2D) {
     match &instance.engine_settings.engine_env {
         RenderingEnvironment::Sdl2(sdl2_env) => {
             for event in sdl2_env.sdl_context.event_pump().unwrap().poll_iter() {
                 match event {
-                    Event::Quit {..} => instance.engine_settings.keys.QUIT = true,
-                    Event::KeyDown { keycode: Some(key), .. } => {
+                    Event::Quit { .. } => instance.engine_settings.keys.QUIT = true,
+                    Event::KeyDown {
+                        keycode: Some(key), ..
+                    } => {
                         // Print the pressed key to the console
                         match key {
                             Keycode::Escape => instance.engine_settings.keys.ESCAPE = true,
@@ -239,10 +294,12 @@ pub fn update_keystrokes(instance: &mut Instance2D) {
                             Keycode::X => instance.engine_settings.keys.X = true,
                             Keycode::Y => instance.engine_settings.keys.Y = true,
                             Keycode::Z => instance.engine_settings.keys.Z = true,
-                            _=>{}
+                            _ => {}
                         }
-                    },
-                    Event::KeyUp { keycode: Some(key), .. } => {
+                    }
+                    Event::KeyUp {
+                        keycode: Some(key), ..
+                    } => {
                         // Print the pressed key to the console
                         match key {
                             Keycode::Escape => instance.engine_settings.keys.ESCAPE = false,
@@ -275,18 +332,15 @@ pub fn update_keystrokes(instance: &mut Instance2D) {
                             Keycode::X => instance.engine_settings.keys.X = false,
                             Keycode::Y => instance.engine_settings.keys.Y = false,
                             Keycode::Z => instance.engine_settings.keys.Z = false,
-                            _=>{}
+                            _ => {}
                         }
-                    },
+                    }
                     _ => {}
                 }
             }
         }
     }
-
 }
-
-
 
 #[allow(non_snake_case)]
 pub fn new_2D_window(engine: RenderingEngine2D, screen: Screen) -> RenderingEnvironment {
@@ -308,4 +362,3 @@ pub fn update_display(env: &mut RenderingEnvironment) {
         RenderingEnvironment::Sdl2(sld2_env) => sdl2_renderer::sdl2_update_display(sld2_env),
     }
 }
-
