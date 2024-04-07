@@ -1,6 +1,6 @@
 use std::vec;
 
-use render::{ Keys, RenderingEnvironment, Vec2};
+use render::{ Color, Keys, RenderingEnvironment, Vec2};
 
 mod eventloop;
 mod render;
@@ -62,6 +62,15 @@ pub struct Environment {
 //         self.events.append(&mut other_list.events)
 //     }
 // }
+
+struct EntityTag<T> {
+    tag_name: String,
+    tag_value: TagValue<T>,
+}
+
+enum TagValue<T> {
+    Value(T),
+}
 
 #[derive(Clone)]
 pub struct Entity {
@@ -140,6 +149,9 @@ impl Instance2D {
         &self.engine_settings.keys
     }
 
+    pub fn update_display(&mut self) {
+        
+    }
 
 
 }
@@ -155,6 +167,10 @@ impl EngineSettings2D {
             is_running: true,
             keys: Keys::new(),
         }
+    }
+
+    pub fn update_display(&mut self) {
+        render::update_display(&mut self.engine_env)
     }
 }
 
@@ -223,7 +239,7 @@ fn close_window_builtin(instance: &mut Instance2D) {
 }
 
 fn update_display_builtin(instance: &mut Instance2D) {
-    
+    instance.engine_settings.update_display();
 }
 
 

@@ -6,6 +6,8 @@ fn main() {
     instance.environment.add_entity(Entity::new().with_update_fn(up));
 
 
+
+
     instance.start()
 }
 

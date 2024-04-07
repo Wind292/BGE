@@ -1,6 +1,7 @@
 use crate::render::Sdl2Env;
 use crate::render::VisualRect;
 use crate::Screen;
+use crate::render::Color;
 
 use sdl2::rect::Rect;
 
@@ -23,6 +24,9 @@ pub fn new_window(screen: Screen) -> Sdl2Env {
 }
 
 pub fn sdl2_draw_rect(sdl2_env: &mut Sdl2Env, rect: VisualRect) {
+
+    sdl2_env.canvas.set_draw_color(sdl2::pixels::Color::RGB(rect.color.r,rect.color.g,rect.color.b));
+
     let width_result = rect.size.x.try_into();
     let width: u32 = match width_result {
         Ok(val) => val,
@@ -44,9 +48,10 @@ pub fn sdl2_draw_rect(sdl2_env: &mut Sdl2Env, rect: VisualRect) {
         }
     };
 
+
     let _ = sdl2_env
         .canvas
-        .draw_rect(Rect::new(rect.location.x, rect.location.y, width, length));
+        .fill_rect(Rect::new(rect.location.x, rect.location.y, width, length));
 }
 
 pub fn sdl2_update_display(sdl2_env: &mut Sdl2Env) {

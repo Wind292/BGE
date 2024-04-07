@@ -13,6 +13,30 @@ pub struct Vec2 {
     pub y: i32,
 }
 
+#[derive(Debug)]
+pub struct Color {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+}
+
+impl Color {
+    pub fn white() -> Self {
+        Color {
+            r: 255,
+            g: 255,
+            b: 255
+        }
+    }
+    pub fn black() -> Self {
+        Color {
+            r: 0,
+            g: 0,
+            b: 0
+        }
+    }
+}
+
 impl Vec2 {
     pub fn new(x: i32, y: i32) -> Self {
         Vec2 { x: x, y: y }
@@ -22,13 +46,15 @@ impl Vec2 {
 pub struct VisualRect {
     pub location: Vec2,
     pub size: Vec2,
+    pub color: Color
 }
 
 impl VisualRect {
-    pub fn new(location: Vec2, size: Vec2) -> Self {
+    pub fn new(location: Vec2, size: Vec2, color: Color) -> Self {
         VisualRect {
             location: location,
             size: size,
+            color: color
         }
     }
 }

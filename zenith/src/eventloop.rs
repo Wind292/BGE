@@ -1,13 +1,17 @@
-use crate::render::update_keystrokes;
+use crate::render::{draw_rect, update_keystrokes, Color, Vec2, VisualRect};
 use crate::Instance2D;
 use std::time::{Duration, Instant};
 
+
 pub fn eventloop(instance: Instance2D) {
     let mut instance = start_entities(instance); // Run the start functions on all of the entities
-
+    
     let framerate_goal = instance.screen.framerate_cap;
     let frame_duration = Duration::from_secs(1) / framerate_goal as u32;
     let mut last_frame_time = Instant::now();
+
+
+    draw_rect(VisualRect::new(Vec2::new(0, 0), Vec2::new(100, 100), Color::white()), &mut instance.engine_settings.engine_env);
 
     loop {
         let frame_start_time = Instant::now();
@@ -18,7 +22,7 @@ pub fn eventloop(instance: Instance2D) {
         update_keystrokes(&mut instance);
 
         instance = update_entities(instance);
-        
+
         maintain_framerate(frame_duration, &mut last_frame_time, frame_start_time);
     }
 }
