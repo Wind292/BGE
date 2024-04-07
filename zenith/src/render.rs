@@ -7,12 +7,14 @@ use sdl2::video::Window;
 use sdl2::Sdl;
 use sdl2::event::Event;
 
+#[derive(Debug)]
 #[derive(Clone)]
 pub struct Vec2 {
     pub x: i32,
     pub y: i32,
 }
 
+#[derive(Clone)]
 #[derive(Debug)]
 pub struct Color {
     pub r: u8,

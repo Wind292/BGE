@@ -30,6 +30,9 @@ pub fn eventloop(instance: Instance2D) {
 fn update_entities(mut instance: Instance2D) -> Instance2D {
     let entities = instance.environment.entities.clone();
     for entity in entities {
+
+        for tag in entity.tags {}
+
         if let Some(update_function) = &entity.update_function {
             update_function(&mut instance);
         }
@@ -63,7 +66,6 @@ fn maintain_framerate(
 
     if elapsed < frame_duration {
         std::thread::sleep(frame_duration - elapsed);
-        // println!("{:?}", frame_duration - elapsed);
     }
 
     *last_frame_time = Instant::now();

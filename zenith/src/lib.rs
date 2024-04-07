@@ -1,6 +1,7 @@
-use std::vec;
+use std::{collections::btree_map::VacantEntry, ptr::eq, vec};
 
 use render::{Color, Keys, RenderingEnvironment, Vec2};
+use std::collections::HashMap;
 
 mod eventloop;
 mod render;
@@ -33,31 +34,83 @@ pub struct EngineSettings2D {
 }
 #[derive(Clone)]
 pub struct Environment {
-    entities: Vec<Entity<i32>>, // Default Entity tag type is set to i32
+    entities: Vec<Entity>, // Default Entity tag type is set to i32
 }
-#[derive(Clone)]
-pub struct EntityTag<T> {
-    tag_name: String,
-    tag_value: TagValue<T>,
+
+impl Environment {
+    pub fn new() -> Self {
+        Environment {
+            entities: get_builtin_entities(),
+        }
+    }
+
+    pub fn new_skeleton() -> Self {
+        Environment {
+            entities: Vec::new()
+        }
+    }
+
+    pub fn add_entity(&mut self, entity: Entity) {
+        self.entities.push(entity);
+    }
+
+    pub fn mut_entities(&mut self) -> &mut Vec<Entity> {
+        &mut self.entities
+    }
+    pub fn list_entities(&self) -> &Vec<Entity> {
+        &self.entities
+    }
+
+    pub fn print_all_entities(&self) {
+        for ent in &self.entities {
+            if let Some(name) = ent.get_tag("name") {
+                println!("{:?} :", name)
+            } else {
+                println!("'Unnamed Entity' :")
+            }
+            
+            ent.print_tags();
+            print!("\n");
+        }
+    }
+
+    // Might be slow ngl
+    pub fn overwrite(&mut self, name: &str, entity_to_change: &mut Entity) {
+        for entity in &mut self.entities {
+            if entity.get_name() == name {
+                *entity = entity_to_change.clone(); // Assuming Entity implements Clone
+                return;
+            }
+        }
+        eprintln!("Cannot replace - No entity found with the name : {}", name)
+    }
 }
+
+
+#[derive(Debug)]
 #[derive(Clone)]
-pub enum TagValue<T> {
-    Value(T),
+pub enum TagValue {
+    String(String),
+    Int(i32),
+    Float(f32),
+    Double(f64),
+    Color(Color),
+    Vec2(Vec2),
 }
 
 #[derive(Clone)]
-pub struct Entity<T> {
+pub struct Entity {
     pub update_function: Option<fn(&mut Instance2D)>,
     pub start_function: Option<fn(&mut Instance2D)>,
-    pub tags: Vec<EntityTag<T>>,
+    pub tags: HashMap<String, TagValue>,
 }
 
-impl<T> Entity<T> {
+impl Entity {
     pub fn new() -> Self {
         Entity {
             update_function: None,
             start_function: None,
-            tags: Vec::new(),
+            tags: HashMap::new(),
         }
     }
 
@@ -74,14 +127,38 @@ impl<T> Entity<T> {
         x
     }
 
-    pub fn with_tag(self, tag_name: String, tag_value: T) -> Self {
+    pub fn with_tag(self, tag_name: &str, tag_value: TagValue) -> Self {
         let mut x = self;
-        x.tags.push(EntityTag {
-            tag_name,
-            tag_value: TagValue::Value(tag_value),
-        });
+        x.tags.insert(tag_name.to_string(), tag_value);
         x
     }
+    pub fn with_name_tag(self, name: &str) -> Self {
+        let mut x = self;
+        x.tags.insert("name".to_string(), TagValue::String(name.to_string()));
+        x
+    }
+
+    pub fn get_tag(&self, tag_name: &str) ->  Option<TagValue> {
+        self.tags.get(tag_name).cloned()
+    }
+
+    pub fn get_name(&self) ->  String {
+        match self.tags.get("name") {
+            Some(TagValue::String(a)) => a.to_string(),
+            _=>"'Unnamed'".to_string()
+        }
+    }
+    
+
+    pub fn print_tags(&self) {
+        for tag in &self.tags {
+            match tag {
+                _=> println!("{} : {:?}", tag.0, tag.1)
+            }
+
+        }
+    }
+
 }
 
 pub enum RenderingEngine2D {
@@ -98,6 +175,15 @@ impl Instance2D {
         }
     }
 
+    pub fn new_skeleton() -> Self {
+        Instance2D {
+            // Default values
+            screen: Screen::new(),
+            engine_settings: EngineSettings2D::new(),
+            environment: Environment::new_skeleton(),
+        }
+    }
+
     pub fn start(self) {
         eventloop::eventloop(self)
     }
@@ -110,9 +196,10 @@ impl Instance2D {
         &self.engine_settings.keys
     }
 
-    pub fn update_display(&mut self) {
-        
+    pub fn add_tag_handler( ) { 
+
     }
+
 }
 
 impl EngineSettings2D {
@@ -170,23 +257,12 @@ impl Screen {
     }
 }
 
-impl Environment {
-    pub fn new() -> Self {
-        Environment {
-            entities: get_builtin_entities(),
-        }
-    }
 
-    pub fn add_entity(&mut self, entity: Entity<i32>) {
-        self.entities.push(entity);
-    }
-}
-
-fn get_builtin_entities() -> Vec<Entity<i32>> {
+fn get_builtin_entities() -> Vec<Entity> {
     let mut entities = vec![];
 
-    entities.push(Entity::new().with_update_fn(close_window_builtin));
-    entities.push(Entity::new().with_update_fn(update_display_builtin));
+    entities.push(Entity::new().with_update_fn(close_window_builtin).with_name_tag("Close Window Function - BUILT-IN"));
+    entities.push(Entity::new().with_update_fn(update_display_builtin).with_name_tag("Update Display Function - BUILT-IN"));
 
     entities
 }
