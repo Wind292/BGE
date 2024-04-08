@@ -1,4 +1,5 @@
-use crate::render::{draw_rect, update_keystrokes, Color, Vec2, VisualRect};
+use crate::render::{draw_rect, update_keystrokes, VisualRect};
+use crate::*;
 use crate::Entity;
 use crate::Instance2D;
 use std::time::{Duration, Instant};

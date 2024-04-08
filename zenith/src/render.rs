@@ -1,5 +1,6 @@
 use crate::sdl2_renderer::{self};
-use crate::{Instance2D, RenderingEngine2D, Screen};
+use crate::*;
+
 use sdl2::keyboard::Keycode;
 use sdl2::render::Canvas;
 
@@ -7,37 +8,7 @@ use sdl2::event::Event;
 use sdl2::video::Window;
 use sdl2::Sdl;
 
-#[derive(Debug, Clone)]
-pub struct Vec2 {
-    pub x: i32,
-    pub y: i32,
-}
 
-#[derive(Clone, Debug)]
-pub struct Color {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
-}
-
-impl Color {
-    pub fn white() -> Self {
-        Color {
-            r: 255,
-            g: 255,
-            b: 255,
-        }
-    }
-    pub fn black() -> Self {
-        Color { r: 0, g: 0, b: 0 }
-    }
-}
-
-impl Vec2 {
-    pub fn new(x: i32, y: i32) -> Self {
-        Vec2 { x: x, y: y }
-    }
-}
 
 pub struct VisualRect {
     pub location: Vec2,

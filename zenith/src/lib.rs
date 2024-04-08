@@ -1,15 +1,9 @@
-use render::{Color, Keys, RenderingEnvironment, Vec2};
-use std::collections::HashMap;
+use render::{Keys, RenderingEnvironment};
+use std::{collections::HashMap, f32::INFINITY};
 
 mod eventloop;
 mod render;
 mod sdl2_renderer;
-
-// !!EXAMPLE!!
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-// !!  !!!  !!
 
 pub struct Instance2D {
     pub screen: Screen,
@@ -94,6 +88,26 @@ impl Environment {
             println!("    {}",script.0)
         }
     }
+    
+    // Might be slow someone optimise / By someone I mean me :cry:
+    pub fn get_entity(&self, name: &str) -> Option<Entity>{
+        for entity in &self.entities {
+            if entity.get_name() == name { 
+                return Some(entity.clone())
+            }
+        }
+        None
+    }
+
+    pub fn get_mut_entity(&mut self, name: &str) -> Option<&mut Entity>{
+        for entity in &mut self.entities {
+            if entity.get_name() == name { 
+                return Some(entity)
+            }
+        }
+        None
+    }
+
 
     // Might be slow ngl
     pub fn overwrite(&mut self, name: &str, entity_to_change: &mut Entity) {
@@ -115,6 +129,83 @@ pub enum TagValue {
     Double(f64),
     Color(Color),
     Vec2(Vec2),
+}
+
+impl TagValue {
+    pub fn extract_string(&self) -> Option<String> {
+        match &self {
+            TagValue::String(x) => Some(x.to_string()),
+            _=>None
+        }
+    }
+    pub fn extract_float(&self) -> Option<f32> {
+        match &self {
+            TagValue::Float(x) => Some(*x),
+            _=>None
+        }
+    }
+    pub fn extract_int(&self) -> Option<i32> {
+        match &self {
+            TagValue::Int(x) => Some(*x),
+            _=>None
+        }
+    }
+    pub fn extract_double(&self) -> Option<f64> {
+        match &self {
+            TagValue::Double(x) => Some(*x),
+            _=>None
+        }
+    }
+    pub fn extract_color(&self) -> Option<Color> {
+        match &self {
+            TagValue::Color(x) => Some(x.clone()),
+            _=>None
+        }
+    }
+    pub fn extract_vec2(&self) -> Option<Vec2> {
+        match &self {
+            TagValue::Vec2(x) => Some(x.clone()),
+            _=>None
+        }
+    }
+
+    pub fn apply(&mut self, formula: fn( )->Self) {
+
+    }
+
+}
+
+#[derive(Debug, Clone)]
+pub struct Vec2 {
+    pub x: i32,
+    pub y: i32,
+}
+
+
+#[derive(Clone, Debug)]
+pub struct Color {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+}
+
+impl Color {
+    pub fn white() -> Self {
+        Color {
+            r: 255,
+            g: 255,
+            b: 255,
+        }
+    }
+    pub fn black() -> Self {
+        Color { r: 0, g: 0, b: 0 }
+    }
+}
+
+impl Vec2 {
+    pub fn new(x: i32, y: i32) -> Self {
+        Vec2 { x: x, y: y }
+    }
 }
 
 #[derive(Clone)]
@@ -159,6 +250,10 @@ impl Entity {
 
     pub fn get_tag(&self, tag_name: &str) -> Option<TagValue> {
         self.tags.get(tag_name).cloned()
+    }
+
+    pub fn set_tag(&mut self, tag_name: &str, tag_value: TagValue) {
+        self.tags.insert(tag_name.to_string(), tag_value);
     }
 
     pub fn get_name(&self) -> String {
@@ -293,15 +388,4 @@ fn close_window_builtin(instance: &mut Instance2D) {
 
 fn update_display_builtin(instance: &mut Instance2D) {
     instance.engine_settings.update_display();
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
 }
